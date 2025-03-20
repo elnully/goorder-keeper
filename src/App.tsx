@@ -1,70 +1,72 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { PageLayout } from "@/components/PageLayout";
+import { CustomerLayout } from "@/components/CustomerLayout";
+import {
+  Index,
+  Login,
+  Dashboard,
+  Products,
+  Orders,
+  Customers,
+  Settings,
+  CustomerLogin,
+  CustomerProducts,
+  CustomerStores,
+  CustomerProductDetail,
+  NotFound
+} from "@/pages";
+import Register from "@/pages/Register";
+import Cart from "@/pages/Cart";
+import OrderSuccess from "@/pages/OrderSuccess";
 
-import Dashboard from "./pages/Dashboard";
-import Orders from "./pages/Orders";
-import Products from "./pages/Products";
-import Customers from "./pages/Customers";
-import Settings from "./pages/Settings";
-import Login from "./pages/Login";
-import NotFound from "./pages/NotFound";
+import "./App.css";
 
+// Initialize the QueryClient
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Router>
         <AuthProvider>
           <Routes>
-            {/* Public routes */}
+            {/* Public Routes */}
+            <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/customer-login" element={<CustomerLogin />} />
+            <Route path="/register" element={<Register />} />
             
-            {/* Protected routes */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/orders" element={
-              <ProtectedRoute>
-                <Orders />
-              </ProtectedRoute>
-            } />
-            <Route path="/products" element={
-              <ProtectedRoute>
-                <Products />
-              </ProtectedRoute>
-            } />
-            <Route path="/customers" element={
-              <ProtectedRoute>
-                <Customers />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } />
+            {/* Customer Routes - Wrapped in CustomerLayout */}
+            <Route path="/" element={<CustomerLayout />}>
+              <Route path="/products" element={<CustomerProducts />} />
+              <Route path="/stores" element={<CustomerStores />} />
+              <Route path="/products/:id" element={<CustomerProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/order-success" element={<OrderSuccess />} />
+            </Route>
             
-            {/* Redirect root to dashboard */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            {/* Admin Routes - Protected and wrapped in PageLayout */}
+            <Route path="/" element={<ProtectedRoute><PageLayout /></ProtectedRoute>}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/admin/products" element={<Products />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/customers" element={<Customers />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
             
-            {/* 404 route */}
+            {/* 404 Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <Toaster position="top-center" />
         </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+      </Router>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
