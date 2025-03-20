@@ -5,10 +5,11 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: ReactNode;
+  requireAdmin?: boolean;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
   // If authentication is still loading, show nothing or a loader
@@ -23,9 +24,16 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
   
-  // If not authenticated, redirect to login
+  // If not authenticated, redirect to appropriate login page
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // If this is an admin route, redirect to admin login, otherwise customer login
+    const loginPath = requireAdmin ? "/login" : "/customer/login";
+    return <Navigate to={loginPath} state={{ from: location }} replace />;
+  }
+
+  // For admin routes, check if user has admin role
+  if (requireAdmin && user?.role !== 'admin') {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   // If authenticated, render the protected route

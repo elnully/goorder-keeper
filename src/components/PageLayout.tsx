@@ -9,6 +9,7 @@ interface PageLayoutProps {
 }
 
 export function PageLayout({ children, className }: PageLayoutProps) {
+  // This layout is specifically for the admin portal
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
