@@ -126,7 +126,7 @@ export default function CustomerProducts() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Categories</SelectItem>
-                        {categories.map(category => (
+                        {categories.map((category: string) => (
                           <SelectItem key={category} value={category}>{category}</SelectItem>
                         ))}
                       </SelectContent>
@@ -140,7 +140,7 @@ export default function CustomerProducts() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Stores</SelectItem>
-                        {stores.map(store => (
+                        {stores.map((store: string) => (
                           <SelectItem key={store} value={store}>{store}</SelectItem>
                         ))}
                       </SelectContent>
@@ -190,7 +190,7 @@ export default function CustomerProducts() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map(category => (
+                      {categories.map((category: string) => (
                         <SelectItem key={category} value={category}>{category}</SelectItem>
                       ))}
                     </SelectContent>
@@ -205,7 +205,7 @@ export default function CustomerProducts() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Stores</SelectItem>
-                      {stores.map(store => (
+                      {stores.map((store: string) => (
                         <SelectItem key={store} value={store}>{store}</SelectItem>
                       ))}
                     </SelectContent>

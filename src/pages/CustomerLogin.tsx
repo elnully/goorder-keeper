@@ -43,7 +43,7 @@ export default function CustomerLogin() {
     setTimeout(() => {
       // Any code will work for the demo
       if (verificationCode.length === 6) {
-        login();
+        login({ isAuthenticated: true, role: 'customer' });
         toast({
           title: "Login successful",
           description: "Welcome to GoOrder!",
