@@ -1,109 +1,97 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const { loginWithCredentials } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsLoading(true);
     
     try {
-      await login(email, password);
-      // Successfully logged in, redirect handled in auth context
+      await loginWithCredentials(email, password);
     } catch (error) {
-      console.error('Login error:', error);
-      setIsSubmitting(false);
+      console.error('Login failed:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-muted/30">
-      <div className="w-full max-w-md flex flex-col items-center gap-8 animate-fadeIn">
-        <div className="flex flex-col items-center">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="relative h-12 w-12 overflow-hidden rounded-full bg-brand-500">
-              <img 
-                src="/lovable-uploads/85fa89cf-b03f-440d-b792-6d44a883e5ca.png" 
-                alt="GoOrder Logo" 
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <h1 className="text-3xl font-bold">GoOrder</h1>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1 text-center">
+          <div className="flex justify-center mb-4">
+            <img src="/logo.svg" alt="GoOrder" className="h-12" />
           </div>
-          <h2 className="text-2xl font-semibold text-center mb-1">Admin Login</h2>
-          <p className="text-muted-foreground text-center mb-6">Enter your credentials to access the dashboard.</p>
-        </div>
-        
-        <Card className="w-full shadow-lg border-black/5 dark:border-white/5">
+          <CardTitle className="text-2xl">Admin Login</CardTitle>
+          <CardDescription>
+            Enter your email and password to access the dashboard
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
           <form onSubmit={handleSubmit}>
-            <CardHeader>
-              <CardTitle>Sign In</CardTitle>
-              <CardDescription>
-                Access your admin dashboard
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="email" className="text-sm font-medium">
+                  Email
+                </label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="admin@goorder.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  disabled={isSubmitting}
                   required
+                  disabled={isLoading}
                 />
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <Button variant="link" className="p-0 h-auto text-xs" type="button">
-                    Forgot password?
-                  </Button>
+              <div className="grid gap-2">
+                <label htmlFor="password" className="text-sm font-medium">
+                  Password
+                </label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="h-4 w-4" />
+                    ) : (
+                      <EyeIcon className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isSubmitting}
-                  required
-                />
               </div>
-            </CardContent>
-            <CardFooter>
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
+              <Button className="w-full" type="submit" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Sign In"}
               </Button>
-            </CardFooter>
+            </div>
           </form>
-        </Card>
-        
-        <div className="text-center text-sm text-muted-foreground">
-          <p>For demo use: admin@goorder.com / admin123</p>
-        </div>
-      </div>
+        </CardContent>
+        <CardFooter className="text-center text-sm text-muted-foreground">
+          <p className="w-full">For admin access use: admin@goorder.com / admin123</p>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

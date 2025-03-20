@@ -10,11 +10,17 @@ interface User {
   role: string;
 }
 
+interface LoginParams {
+  isAuthenticated: boolean;
+  role: string;
+}
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (params: LoginParams) => void;
+  loginWithCredentials: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -54,7 +60,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  // This is the function used by CustomerLogin
+  const login = (params: LoginParams) => {
+    // For customer login (using phone verification)
+    // Create a simplified user object for customers
+    const customerUser = {
+      id: Date.now().toString(), // Generate a temporary ID
+      name: 'Customer', // Generic name since we only have phone
+      email: '', // Empty since we don't collect email
+      role: params.role,
+    };
+    
+    // Store in state and localStorage
+    setUser(customerUser);
+    localStorage.setItem('goorder-user', JSON.stringify(customerUser));
+    
+    // Redirect to home or intended page
+    const destination = location.state?.from?.pathname || '/';
+    navigate(destination);
+  };
+
+  // This is the original login function for admin
+  const loginWithCredentials = async (email: string, password: string) => {
     setIsLoading(true);
     
     // Simulate API call delay
@@ -100,7 +127,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated: !!user, 
+      isLoading, 
+      login, 
+      loginWithCredentials, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );
